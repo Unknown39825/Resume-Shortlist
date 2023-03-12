@@ -7,6 +7,7 @@ from flask import Flask,  jsonify, request,  render_template
 from flask_cors import CORS
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf','docx','doc'}
+import shortlist
 
 app = Flask(__name__)
 CORS(app)
@@ -85,9 +86,13 @@ def upload_file():
 
         # result json
         result = ""
-
-        # skill from the query
+        # call the shortlist function
+        result,query_skills= shortlist.toTxt(query,rand_str)
+        # shutil.rmtree(app.config['UPLOAD_FOLDER'] + '/' + rand_str)
         skills = []
+        for i in query_skills:
+            skills.append({'skill':i})
+    
 
 
         return jsonify({'results': result,'querySkills':skills}), 200

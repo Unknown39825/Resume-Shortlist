@@ -1,6 +1,9 @@
 
 import os
+import shutil
+import shortuuid
 from werkzeug.utils import secure_filename
+from flask import Flask,  jsonify, request,  render_template
 from flask_cors import CORS
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf','docx','doc'}
@@ -44,7 +47,59 @@ def file_upload():
 @app.route('/list')
 def list_files():
     return make_tree(r'uploads')
-	
+
+
+# file uploader function
+@app.route('/uploader', methods = ['POST'])
+def upload_file():
+    try:
+    # check for file
+    # print (request.files)
+        if  'resume' not in request.files:
+            # send error message
+            return jsonify({'message': 'No file selected for jobdesc or resume'}), 400
+
+        # resumes
+        resumes = request.files.getlist('resume')
+
+        # read the input query i.e. job description
+        query = request.form['query']
+        # generate a random string for the folder name        
+        rand_str = shortuuid.uuid()
+        folderp1 = os.path.join(app.config['UPLOAD_FOLDER'], rand_str,'raw_resume')
+        folderp2 = os.path.join(app.config['UPLOAD_FOLDER'], rand_str,'txt_resume')
+        os.makedirs(folderp1)
+        os.makedirs(folderp2)
+
+        # process all resumes
+        for resume in resumes:
+            # check if file is allowed
+            # print(resume)
+            if resume.filename == '':
+                return jsonify({'message': 'No file selected for resume'}), 400
+            if resume.filename.rsplit('.', 1)[1].lower() not in ALLOWED_EXTENSIONS:
+                return jsonify({'message': 'File extension not allowed'}), 400
+
+            # save file
+            resume.save(os.path.join(app.config['UPLOAD_FOLDER'] +'/'+ rand_str+ '/raw_resume', secure_filename(resume.filename)))
+
+        # result json
+        result = ""
+
+        # skill from the query
+        skills = []
+
+
+        return jsonify({'results': result,'querySkills':skills}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({'message': 'Error in processing'}), 400
+    
+    finally:
+        shutil.rmtree(app.config['UPLOAD_FOLDER'] + '/' + rand_str)
+
+    
+
 	
 if __name__ == '__main__':
 	if cf_port is None:

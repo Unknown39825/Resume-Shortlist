@@ -12,6 +12,7 @@ import os,math,re
 nltk.download('stopwords')
 # punkt used for tokenizing
 nltk.download('punkt')
+import utils
 
 
 # to txt function to convert docx to txt used for converting the doc resume to the txt resume
@@ -51,6 +52,29 @@ def readFiles(query,uuid):
 
 # pre process the file 
 def process(files,xfiles,query,uuid):
-   return query,xfiles
+    doc_sizes = []
+    stemmed = []
+    n = len(files)
+    for i in files:
+        text = utils.extract_text(i)
+        tokens = utils.preprocess(text)
+        tokens = utils.sw_remove(tokens)
+        tokens = utils.stem_tokens(tokens)
+        doc_sizes.append(len(tokens))
+        stemmed.extend(tokens)
+
+    table = utils.inv_ind(stemmed,doc_sizes,n,xfiles)
+    # print(table['uranium'])
+    df = pd.DataFrame(table.items(), columns=['Tokens','Occurences'])
+    
+    try:
+
+        os.remove(r'uploads/'+uuid +'/Inverted.csv')
+    except:
+        pass
+    df.to_csv(r'uploads/'+uuid +'/Inverted.csv')
+    print(df)
+    return xfiles,files
+    
     
     

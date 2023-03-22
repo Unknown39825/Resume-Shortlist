@@ -13,7 +13,7 @@ nltk.download('stopwords')
 # punkt used for tokenizing
 nltk.download('punkt')
 import utils
-
+import json
 
 # to txt function to convert docx to txt used for converting the doc resume to the txt resume
 #----------------------------------------------------------------------------------------------

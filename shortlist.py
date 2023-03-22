@@ -2,18 +2,21 @@
 from __future__ import division
 from ctypes import util
 from datetime import datetime
+import os
 # aspose used for converting docx to txt
 import aspose.words as aw
 # nltk used for preprocessing
 import nltk
 import pandas as pd
+import matplotlib.pyplot as plt
 import os,math,re
+import json
 # stopwords used for removing stopwords
 nltk.download('stopwords')
 # punkt used for tokenizing
 nltk.download('punkt')
 import utils
-import json
+
 
 # to txt function to convert docx to txt used for converting the doc resume to the txt resume
 #----------------------------------------------------------------------------------------------
@@ -29,6 +32,7 @@ def toTxt(query,uuid):
             continue
     return readFiles(query,uuid)
 
+#-----------------------------------------------------------------------------------------------
 
 
 
@@ -48,9 +52,12 @@ def readFiles(query,uuid):
     xfiles = [(i[len(i) - i[::-1].index('/'):]) for i in files]
     print(xfiles)
     return process(files,xfiles,query,uuid)
+    
+    
 
 
-# pre process the file 
+
+
 def process(files,xfiles,query,uuid):
     doc_sizes = []
     stemmed = []
@@ -73,15 +80,21 @@ def process(files,xfiles,query,uuid):
     except:
         pass
     df.to_csv(r'uploads/'+uuid +'/Inverted.csv')
-    print(df)
+    # print(df)
     return calculateidf(xfiles,query,uuid,files)
-    
-    
 
+# Retrieval using query
+def get_data(query,uuid):
+    df = pd.read_csv(r'uploads/'+uuid +'/Inverted.csv')
+    df.set_index('Tokens',inplace=True)
+    try:
+        x = df.loc[query,'Occurences']
+        return x
+    except:
+        return -1
 
 # get idf values
 def get_idf(n,uuid,inv_file=None):
-    # open the inverted file 
   df = pd.read_csv(r'uploads/'+uuid +'/Inverted.csv')
   # print(df)
   idf = dict()
@@ -90,24 +103,6 @@ def get_idf(n,uuid,inv_file=None):
       idf[df['Tokens'][i]] = math.log(n/test.count('('),2)
   print(idf)
   return idf
-
-
-
-
-# obtain query vector on the query usind the idf
-def get_query_vector(query, idf):
-    tokens = utils.preprocess(query.lower())
-    tokens = utils.sw_remove(tokens)
-    tokens = utils.stem_tokens(tokens)
-
-    q = {}
-    for i in idf.keys():
-        if i in tokens:
-            q[i] = (tokens.count(i) / len(set(tokens))) * idf[i]
-        else:
-            q[i] = 0
-
-    return q
 
 
 # get tf*idf matrix
@@ -144,7 +139,20 @@ def get_tf_idf_matrix(idf,xfiles):
     return matrix
 
 
+# obtain query vector
+def get_query_vector(query, idf):
+    tokens = utils.preprocess(query.lower())
+    tokens = utils.sw_remove(tokens)
+    tokens = utils.stem_tokens(tokens)
 
+    q = {}
+    for i in idf.keys():
+        if i in tokens:
+            q[i] = (tokens.count(i) / len(set(tokens))) * idf[i]
+        else:
+            q[i] = 0
+
+    return q
 
 # Given 2 vectors (a,b) compute similarity
 def compute_sim(a,b):
@@ -159,9 +167,20 @@ def compute_sim(a,b):
     return 0
 
 
+# Similarity between the documents
+def get_similarity_matrix(xfiles,doc_matrix):
+  n = len(xfiles)
 
+  sim_mat = []
+  for i in range(n):
+    sim_mat.append([1]*n)
 
-
+  for i in range(n):
+    for j in range(i):
+      a = doc_matrix[xfiles[i]]
+      b = doc_matrix[xfiles[j]]
+      sim_mat[i][j] = sim_mat[j][i] = compute_sim(a,b)
+  return pd.DataFrame(sim_mat,index=xfiles,columns=xfiles)
 
 def calculateidf(xfiles,text,uuid,files):
     #-----------------------------------------------------------------------------------------------
@@ -173,15 +192,12 @@ def calculateidf(xfiles,text,uuid,files):
             querry_skills.append(skill)
     print("querry skills:" + str(querry_skills))
 
-   # get the collges list from the json
     with open('colleges.json') as f:
-        data = json.load(f)
+            data = json.load(f)
     clg = data.get('colleges')
     print (clg)
-   
 
     nc = len(clg)
-    # colleges rank list prepared on the basis of the data fetched
     rank = list(range(1, nc + 1))
     rank.reverse()
 
@@ -194,17 +210,17 @@ def calculateidf(xfiles,text,uuid,files):
     print("Query : ")
     query = get_query_vector(text,idf)
 
-    # define the vector to return the result
     vect = []
     for i,j in zip(files,xfiles):
-        # intialise the inital count for the score calculation
         xyz=0
-        # open the file
         file1 = open(i, "r")
-        # read the file
+        # print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'+i)
         readfile = file1.read()
         for (c, r) in zip(clg, rank):
+            # print("............................"+c)
+            # print(r)
             if c in readfile:
+                # vect[j] = {compute_sim(matrix[j],query),r/nc,c}
                 xyz= (r / nc)
         skill_name=[]
         tokens = nltk.word_tokenize(readfile)
@@ -213,8 +229,6 @@ def calculateidf(xfiles,text,uuid,files):
         print(j + " 's skills:")
         print()
         count = 0
-
-        # count the skill matched by the query and skill matched in the resume
         for skill in querry_skills:
             if skill in readfile:
                 count = count + 1
@@ -224,7 +238,7 @@ def calculateidf(xfiles,text,uuid,files):
 
 
         print('xxxxxxxxxxxxxxxxxxxxxxxxxx')
-        # compute the similarity between the matrix & the query
+
         sim=compute_sim(matrix[j],query)
         slent = len(querry_skills)
         if slent!=0:
@@ -234,8 +248,4 @@ def calculateidf(xfiles,text,uuid,files):
         vect.append({'filename':j ,'similarity': sim,'finalscore':sim+xyz+ss,'cllg':xyz,'skillScore':ss,'skills':skill_name})
         
 
-    # print(vect[i])
-    print(pd.DataFrame(vect.items(),columns=['File','Relevance']))
-    
-    # send in json
     return vect,querry_skills

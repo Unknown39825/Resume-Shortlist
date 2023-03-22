@@ -1,15 +1,15 @@
 
 import os
 import shutil
-
+from flask import Flask,  jsonify, request,  render_template
 import shortuuid
 from werkzeug.utils import secure_filename
-from flask import Flask,  jsonify, request,  render_template
 from flask_cors import CORS
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf','docx','doc'}
 import shortlist
 
+# python app setup
 app = Flask(__name__)
 CORS(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -49,9 +49,9 @@ def file_upload():
 @app.route('/list')
 def list_files():
     return make_tree(r'uploads')
-
-
-# file uploader function
+	
+	
+# the file uploader function
 @app.route('/uploader', methods = ['POST'])
 def upload_file():
     try:
@@ -85,20 +85,19 @@ def upload_file():
             # save file
             resume.save(os.path.join(app.config['UPLOAD_FOLDER'] +'/'+ rand_str+ '/raw_resume', secure_filename(resume.filename)))
 
-        # result json
         result = ""
+
         # call the shortlist function
         result,query_skills= shortlist.toTxt(query,rand_str)
         # shutil.rmtree(app.config['UPLOAD_FOLDER'] + '/' + rand_str)
         skills = []
         for i in query_skills:
             skills.append({'skill':i})
-    
-
 
         return jsonify({'results': result,'querySkills':skills}), 200
     except Exception as e:
         print(e)
+        # shutil.rmtree(app.config['UPLOAD_FOLDER'] + '/' + rand_str)
         return jsonify({'message': 'Error in processing'}), 400
     
     finally:
@@ -106,7 +105,6 @@ def upload_file():
 
     
 
-	
 if __name__ == '__main__':
 	if cf_port is None:
 		app.run(host='0.0.0.0', port=5000, debug=True)

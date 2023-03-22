@@ -1,11 +1,10 @@
-# import require packages 
-
-import nltk # natural language toolkit  
-from nltk.tokenize import RegexpTokenizer #tokenize the regex expression
-from nltk.corpus import stopwords # remove the stopwords
-from nltk import FreqDist # frequency distribution 
-from nltk.stem import PorterStemmer # Porter Stemmer used for removing the suffixes
-from nltk.tokenize import word_tokenize # tokenize the words 
+import nltk
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
+from nltk import FreqDist
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
 
 
 
@@ -14,17 +13,6 @@ def extract_text(fname):
     myf = open(fname,"rb")
     text = myf.read().decode(errors='replace')
     return text
-
-
-#doing analysis on the text
-def uniqratio(token):
-  return str(len(set(token))/len(token))
-
-
-#Checking distribution of words
-def freqDist(tokens,title):
-  fdist1 = FreqDist(tokens)
-  fdist1.plot(50, cumulative=True, title=title)
 
 
 #Tokenizing the text, return token list
@@ -62,8 +50,6 @@ class CreateInvDict:
             self.myd[i].append(x)
 
 
-
-# freq list of word in doc, return list
 def freq_list(str, word):
     count = str.count(word)
     mid = -1

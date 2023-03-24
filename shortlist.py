@@ -47,10 +47,13 @@ def readFiles(query,uuid):
 
     for i in dir_list:
         files.append(path + '/' + i)
-    for i in files:
-        print(i)
+    # for i in files:
+        # print(i)
     xfiles = [(i[len(i) - i[::-1].index('/'):]) for i in files]
-    print(xfiles)
+    # print(xfiles)
+    print("files & xfiles")
+    # print(files)
+    # print(xfiles)
     return process(files,xfiles,query,uuid)
     
     
@@ -100,17 +103,21 @@ def get_idf(n,uuid,inv_file=None):
   idf = dict()
   for i in range(0, len(df)):
       test = list(df['Occurences'][i])
+      print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCc")
+    #   print(test)
       idf[df['Tokens'][i]] = math.log(n/test.count('('),2)
+    #   idf[]
+      print(idf[df['Tokens'][i]])
   print(idf)
   return idf
 
 
 # get tf*idf matrix
-def get_tf_idf_matrix(idf,xfiles):
+def get_tf_idf_matrix(idf,xfiles,uuid):
     matrix = dict()
     words = list(idf.keys())
 
-    df = pd.read_csv(r'Inverted.csv')
+    df = pd.read_csv(r'uploads/'+uuid +'/Inverted.csv')
     df.set_index('Tokens', inplace=True)
 
     for i in range(len(xfiles)):
@@ -156,6 +163,8 @@ def get_query_vector(query, idf):
 
 # Given 2 vectors (a,b) compute similarity
 def compute_sim(a,b):
+  print("Testing compute_sim")
+  print(a,b)
   a = list(a.values())
   b = list(b.values())
   dot_prod = sum([a[i]*b[i] for i in range(len(a))])
@@ -195,14 +204,14 @@ def calculateidf(xfiles,text,uuid,files):
     with open('colleges.json') as f:
             data = json.load(f)
     clg = data.get('colleges')
-    print (clg)
+    # print (clg)
 
     nc = len(clg)
     rank = list(range(1, nc + 1))
     rank.reverse()
 
     idf = get_idf(len(xfiles),uuid)
-    matrix = get_tf_idf_matrix(idf,xfiles)
+    matrix = get_tf_idf_matrix(idf,xfiles,uuid)
     # print(idf)
     # print(matrix)
     print("-:"+"Compute Similarity"+":-")

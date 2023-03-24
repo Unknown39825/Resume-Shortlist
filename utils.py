@@ -78,6 +78,8 @@ def inv_ind(stemmed_docs, doc_sizes, n,xfiles):
                 x = (xfiles[j], freq_count(temp, i))
                 inv_table.checkf(x, i)
             start += end
+    print("inv table")
+    # print(inv_table.myd)
     return inv_table.myd
 
 

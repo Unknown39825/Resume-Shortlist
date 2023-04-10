@@ -88,11 +88,9 @@ def upload_file():
         result = ""
 
         # call the shortlist function
-        result,query_skills= shortlist.toTxt(query,rand_str)
+        result,skills= shortlist.toTxt(query,rand_str)
         # shutil.rmtree(app.config['UPLOAD_FOLDER'] + '/' + rand_str)
-        skills = []
-        for i in query_skills:
-            skills.append({'skill':i})
+      
 
         return jsonify({'results': result,'querySkills':skills}), 200
     except Exception as e:

@@ -2,3 +2,5 @@
 /resumeenv
 /__pycache__
 /uploads
+/client/node_modules
+/client/build

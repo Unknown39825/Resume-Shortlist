@@ -268,20 +268,22 @@ def RecommendCourse(querry_skills,skill_name):
     for skill in recommended_skill:
 
         if skill.lower() in ios_keyword:
-            recommended_courses.append(ios_course)
+            # add all ios courses 
+            
+            recommended_courses.extend(ios_course)
 
         if skill.lower() in android_keyword:
-            recommended_courses.append(android_course)
+            recommended_courses.extend(android_course)
 
         if skill.lower() in web_keyword:
 
-            recommended_courses.append(web_course)
+            recommended_courses.extend(web_course)
 
         if skill.lower() in ds_keyword:
-            recommended_courses.append(ds_course)
+            recommended_courses.extend(ds_course)
 
         if skill.lower() in uiux_keyword:
-            recommended_courses.append(uiux_course)
+            recommended_courses.extend(uiux_course)
         
     return recommended_courses,recommended_skill
 

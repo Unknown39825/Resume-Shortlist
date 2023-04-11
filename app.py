@@ -1,16 +1,21 @@
 
 import os
 import shutil
-from flask import Flask,  jsonify, request,  render_template
+from flask import Flask, send_from_directory, jsonify, render_template, request
 import shortuuid
+
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'txt', 'pdf','docx','doc'}
 import shortlist
 
+# build the react application
+os.system('npm run build --prefix ./client')
+
 # python app setup
-app = Flask(__name__)
+app = Flask(__name__, static_folder="./client/build")
+
 CORS(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -39,10 +44,7 @@ def make_tree(path):
 
 
 
-# basic router for the file
-@app.route('/')
-def file_upload():
-    return render_template('upload.html')
+    
 
 
 # check the updated file on the server
@@ -57,6 +59,11 @@ def upload_file():
     try:
     # check for file
     # print (request.files)
+        rand_str = shortuuid.uuid()
+        folderp1 = os.path.join(app.config['UPLOAD_FOLDER'], rand_str,'raw_resume')
+        folderp2 = os.path.join(app.config['UPLOAD_FOLDER'], rand_str,'txt_resume')
+        os.makedirs(folderp1)
+        os.makedirs(folderp2)
         if  'resume' not in request.files:
             # send error message
             return jsonify({'message': 'No file selected for jobdesc or resume'}), 400
@@ -67,11 +74,8 @@ def upload_file():
         # read the input query i.e. job description
         query = request.form['query']
         # generate a random string for the folder name        
-        rand_str = shortuuid.uuid()
-        folderp1 = os.path.join(app.config['UPLOAD_FOLDER'], rand_str,'raw_resume')
-        folderp2 = os.path.join(app.config['UPLOAD_FOLDER'], rand_str,'txt_resume')
-        os.makedirs(folderp1)
-        os.makedirs(folderp2)
+        # rand_str = shortuuid.uuid()
+        
 
         # process all resumes
         for resume in resumes:
@@ -101,7 +105,22 @@ def upload_file():
     finally:
         shutil.rmtree(app.config['UPLOAD_FOLDER'] + '/' + rand_str)
 
-    
+
+
+
+# basic router for the file
+@app.route("/")
+def serve():
+    """serves React App"""
+    return send_from_directory(app.static_folder, "index.html")
+
+
+@app.route("/<path:path>")
+def static_proxy(path):
+    """static folder serve"""
+    file_name = path.split("/")[-1]
+    dir_name = os.path.join(app.static_folder, "/".join(path.split("/")[:-1]))
+    return send_from_directory(dir_name, file_name)
 
 if __name__ == '__main__':
 	if cf_port is None:

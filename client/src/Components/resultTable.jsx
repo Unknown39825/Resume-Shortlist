@@ -329,7 +329,7 @@ const ResultTable = (
         <Table striped bordered hover>
             <thead>
                 <tr>
-                    <th>Index</th>
+                    <th>Rank</th>
                     <th>File Name</th>
                     <th>College Score</th>
                     <th>Present Skills</th>

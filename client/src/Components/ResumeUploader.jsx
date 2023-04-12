@@ -47,13 +47,14 @@ const ResumeUploader = () => {
             .then((res) => res.json())
             .then((data) => {
                 console.log(data);
-                setResult(data.results);
-                var skills = data.skills;
+                
+                var results = data.results;
                 // sort on the basis of the finalScore
-                skills.sort((a,b)=>{
-                    return a.finalScore - b.finalScore
+                results.sort((a,b)=>{
+                    return b.finalScore - a.finalScore
                 })
-                setSkills(data.skills.sort());
+                setSkills(data.querySkills);
+                setResult(results);
                 setShowResults(true);
             })
             .catch((err) => console.error(err)).finally(() => {

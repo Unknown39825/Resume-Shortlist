@@ -4,3 +4,6 @@
 /uploads
 /client/node_modules
 /client/build
+model.pkl
+tfidf.pkl
+/output

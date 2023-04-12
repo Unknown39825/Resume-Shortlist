@@ -11,7 +11,9 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf','docx','doc'}
 import shortlist
 
 # build the react application
-os.system('npm run build --prefix ./client')
+# if the arg build is given then build the react application
+
+# os.system('npm run build --prefix ./client')
 
 # python app setup
 app = Flask(__name__, static_folder="./client/build")
@@ -103,6 +105,7 @@ def upload_file():
         return jsonify({'message': 'Error in processing'}), 400
     
     finally:
+        print("job done")
         shutil.rmtree(app.config['UPLOAD_FOLDER'] + '/' + rand_str)
 
 

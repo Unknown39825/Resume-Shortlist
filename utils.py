@@ -20,7 +20,9 @@ def preprocess(sentence):
  sentence = sentence.lower()
  tokenizer = RegexpTokenizer(r'\w+')
  tokens = tokenizer.tokenize(sentence)
- return nltk.word_tokenize(" ".join(tokens))
+ processed = nltk.word_tokenize(" ".join(tokens))
+#  print(processed)
+ return  processed
 
 
 # Stopwords removal, return list

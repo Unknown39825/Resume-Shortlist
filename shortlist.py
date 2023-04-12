@@ -3,6 +3,7 @@ from __future__ import division
 from ctypes import util
 from datetime import datetime
 import os
+import seaborn as sns
 
 # aspose used for converting docx to txt
 
@@ -13,10 +14,13 @@ import nltk
 import pandas as pd
 
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 import os,math,re
 
 import json
+from dataVisual import visualiseData
+from modelTrain import predictResults
 
 from courses import ds_course , ds_keyword ,web_course,web_keyword,android_course,android_keyword,ios_course,ios_keyword,uiux_course,uiux_keyword
 
@@ -29,8 +33,22 @@ nltk.download('stopwords')
 nltk.download('punkt')
 import utils
 
-# to txt function to convert docx to txt used for converting the doc resume to the txt resume
+df=pd.read_csv('./cleanedResume.csv')
 
+# show the dataset available
+visualiseData(df)
+# performKnn(df)
+
+
+
+
+
+
+
+
+
+
+# to txt function to convert docx to txt used for converting the doc resume to the txt resume
 #----------------------------------------------------------------------------------------------
 
 def toTxt(query,uuid):
@@ -294,12 +312,16 @@ def calculateidf(xfiles,text,uuid,files):
     df = pd.read_excel(r'skillsList.xlsx')
 
     querySkills = []
+    resumeSkills = []
 
+    # extract skills from the query & resume
     for skill in df.SKILLS:
 
         if skill.lower() in text.lower():
 
             querySkills.append(skill)
+
+    
 
     with open('colleges.json') as f:
 
@@ -343,28 +365,39 @@ def calculateidf(xfiles,text,uuid,files):
 
         count = 0
 
-        my_skills = []
+        matchedSkills = []
         # print(querySkills)
         # print(readfile.lower())
         for skill in querySkills:
-
             if skill.lower() in readfile.lower():
-
-                my_skills.append(skill)
-
+                matchedSkills.append(skill)
                 count = count + 1
-                
+
+        # extract skills from the query & resume
+        resumeSkills = []
+        for skill in df.SKILLS:
+            if skill.lower() in readfile.lower():
+                resumeSkills.append(skill)
+        # print(resumeSkills)
+
+        print("Matched Skills : ",matchedSkills)
+        print("Resume Skills : ",resumeSkills)
         sim=compute_sim(matrix[j],query)
 
         slent = len(querySkills)
 
         recommended_courses = []
+        queryArray = []
+        queryArray.append(' '.join(resumeSkills))
+        print("started")
+        knnResult = predictResults(queryArray)
+        print("ended")
 
-        recommended_courses,recommended_skills = RecommendCourse(querySkills,my_skills)
+        recommended_courses,recommended_skills = RecommendCourse(querySkills,matchedSkills)
         if slent!=0:
             skillPercentage=count/(len(querySkills))
         else:
             skillPercentage=0
         finalScore = sim*30+collegeRanking*5+skillPercentage*30 
-        vect.append({'fileName':j ,'similarity': sim,'finalScore':finalScore,'collegeScore':collegeRanking,'skillScore':skillPercentage*100,'persentSkills':my_skills,'recomendedSkills':recommended_skills,'recomendedCourses':recommended_courses})
+        vect.append({'fileName':j ,'similarity': sim,'finalScore':finalScore,'collegeScore':collegeRanking,'skillScore':skillPercentage*100,'persentSkills':matchedSkills,'resumeSkills':resumeSkills,'recomendedSkills':recommended_skills,'recomendedCourses':recommended_courses,'knnResult':knnResult})
     return vect,querySkills

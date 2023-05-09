@@ -36,7 +36,7 @@ import utils
 df=pd.read_csv('./cleanedResume.csv')
 
 # show the dataset available
-visualiseData(df)
+# visualiseData(df)
 # performKnn(df)
 
 
@@ -321,6 +321,7 @@ def calculateidf(xfiles,text,uuid,files):
 
             querySkills.append(skill)
 
+    querySkills = list(set(querySkills))
     
 
     with open('colleges.json') as f:

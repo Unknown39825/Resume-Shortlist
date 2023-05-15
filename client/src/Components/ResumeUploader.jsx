@@ -1,19 +1,19 @@
 
 import React, { useState, ChangeEvent } from 'react';
+import { useRef } from 'react';
 
-import { Form, Button, Table } from 'react-bootstrap';
+import { Form, Button, Table, Spinner } from 'react-bootstrap';
 import ResultTable from './resultTable';
 import SkillsRequired from './skillsRequired';
 const ResumeUploader = () => {
     const [files, setFiles] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
+    const inputRef = useRef(null)
+    
     const [showResults, setShowResults] = useState(false);
     
-    const [result, setResult] = useState([
-        ]);
-    const [skills, setSkills] = useState([
-    ]);
+    const [result, setResult] = useState([]);
+    const [skills, setSkills] = useState([]);
 
     const handleFileChange = (e) => {
         if (e.target.files) {
@@ -28,7 +28,9 @@ const ResumeUploader = () => {
         console.log("hello");
         console.log(files);
         if (!files || !files.length) {
-            alert("Please select the files");
+            // alert("Please select the files");
+            // show bootstrap alert
+
             return;
         }
 
@@ -40,7 +42,7 @@ const ResumeUploader = () => {
 
         data.append('query', jobDescription)
         console.log("hello");
-        fetch('http://localhost:5000/uploader', {
+        fetch('/uploader', {
             method: 'POST',
             body: data,
         })
@@ -56,11 +58,16 @@ const ResumeUploader = () => {
                 setSkills(data.querySkills);
                 setResult(results);
                 setShowResults(true);
+                setIsLoading(false);
             })
-            .catch((err) => console.error(err)).finally(() => {
+            .catch((err) => {
+                setIsLoading(false)
+            }).finally(() => {
                 setFiles(null);
                 setJobDescription("");  
                 setIsLoading(false);
+                inputRef.current.value = null;
+                
                 // reset the file input
             });
     };
@@ -68,26 +75,44 @@ const ResumeUploader = () => {
     const handleJobDescriptionChange = (e) => {
         setJobDescription(e.target.value);
     };
+
+    const resetForm = ()=>{
+        setFiles(null);
+        setJobDescription("");
+        setIsLoading(false);
+
+        setShowResults(false);
+    }
+  
     return (
-        <div>
+
+        <div >
             {/* basic resume uploader form */}
-            <Form>
-                <Form.Group className="mb-3" controlId="resumesUpload">
-                    <Form.Label>Upload The Resume</Form.Label>
-                    {/* multiple file picker */}
-                    <Form.Control type="file" onChange={handleFileChange} multiple />
 
-                </Form.Group>
+            <div className="container mt-3">
+                <h1>Submit your resume & job Description</h1>
+                <Form>
+                    <Form.Group className="mb-3" controlId="resumesUpload">
+                        <Form.Label as='h3'>Upload The Resume</Form.Label>
+                        {/* multiple file picker */}
+                        <Form.Control type="file" ref={inputRef} onChange={handleFileChange} multiple />
 
-                <Form.Group className="mb-3" controlId="jobDescription">
-                    <Form.Label>Job Description</Form.Label>
-                    <Form.Control type="text" onChange={handleJobDescriptionChange} value={jobDescription} placeholder="Job Description" />
-                </Form.Group>
-                <Button onClick={handleUploadClick} variant="primary" type="submit">
-                    Submit
-                </Button>
+                    </Form.Group>
 
-            </Form>
+                    <Form.Group className="mb-3" controlId="jobDescription">
+                        <Form.Label as='h3'>Job Description</Form.Label>
+                        <Form.Control as="textarea" rows={8} onChange={handleJobDescriptionChange} value={jobDescription} placeholder="Job Description" />
+                    </Form.Group>
+                    <Button onClick={handleUploadClick} variant="primary" type="submit">
+                        Submit
+                    </Button>
+
+                    {
+                        showResults && <Button variant='secondary' className='m-3' onClick={resetForm}>Reset</Button>
+                    }
+
+                </Form>
+            </div>
             
            {
             showResults &&  <>
@@ -100,6 +125,16 @@ const ResumeUploader = () => {
                             <ResultTable result={result} />
                         }
                     </>
+           }
+
+           {
+            isLoading && <>
+                    
+                    <div>
+                        <Spinner animation='border' variant='seconary' className='mt-5' />
+                    </div>
+                
+            </>
            }
 
         </div>

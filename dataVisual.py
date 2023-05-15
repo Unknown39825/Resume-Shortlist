@@ -27,8 +27,8 @@ def visualiseData(df):
     for p in ax.patches:
         ax.annotate(str(p.get_height()), (p.get_x() * 1.01 , p.get_height() * 1.01))
     plt.grid()
-    # plt.savefig('./output/output1.png')
-    plt.show()
+    plt.savefig('./output/output1.png')
+    # plt.show()
 
     # show the category distribution
 
@@ -63,13 +63,14 @@ def visualiseData(df):
     plt.figure(figsize=(16,16))
     plt.imshow(wc, interpolation='bilinear')
     plt.axis("off")
-    plt.show()
+    # plt.show()
+    plt.savefig('./output/output2.png')
 
 
 
 
-df = pd.read_csv('./cleanedResume.csv')
-visualiseData(df)
+# df = pd.read_csv('./cleanedResume.csv')
+# visualiseData(df)
 
 
 

@@ -32,7 +32,7 @@ def modelTrain(df):
     # print(WordFeatures)
     print ("Feature completed .....")
     X_train,X_test,y_train,y_test = train_test_split(WordFeatures,requiredTarget,random_state=1, test_size=0.2,shuffle=True, stratify=requiredTarget)
-    clf = KNeighborsClassifier(n_neighbors=11)
+    clf = KNeighborsClassifier(n_neighbors=22)
     clf.fit(X_train, y_train)
     prediction = clf.predict(X_test)
     # save the model using pickle
@@ -47,11 +47,11 @@ def modelTrain(df):
 
 def predictResults(requiredText):
     print(requiredText)
-    labels = []
-    for cat in df['Category']:
-        if cat not in labels:
-            labels.append(cat)
-    # print(labels)
+    labels = ['Java Developer','Testing','DevOps Engineer','Javascript Developer', 'Web Designing', 'HR','Hadoop', 'Blockchain','ETL Developer', 'Operations Manager','Data Science','Sales','Mechanical Engineer', 'Arts', 'Database', 'Electrical Engineering','Health and fitness','PMO','Business Analyst', 'DotNet Developer', 'Python Developer','Network Security Engineer','SAP Developer', 'Civil Engineer','Advocate']
+    # for cat in df['Category']:
+    #     if cat not in labels:
+    #         labels.append(cat)
+    # # print(labels)
     # load the model from disk
     loaded_model = pickle.load(open('model.pkl', 'rb'))
     loaded_word_vectorizer = pickle.load(open('tfidf.pkl', 'rb'))
@@ -73,4 +73,4 @@ def predictResults(requiredText):
 
 
 
-modelTrain(df)
+# modelTrain(df)

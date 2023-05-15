@@ -13,7 +13,7 @@ import shortlist
 # build the react application
 # if the arg build is given then build the react application
 
-# os.system('npm run build --prefix ./client')
+os.system('npm run build --prefix client')
 
 # python app setup
 app = Flask(__name__, static_folder="./client/build")

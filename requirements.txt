@@ -9,3 +9,6 @@ collection
 shortuuid
 flask_cors
 openpyxl
+seaborn
+wordcloud
+scikit-learn

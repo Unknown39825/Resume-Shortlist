@@ -1,8 +1,8 @@
 
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState } from 'react';
 import { useRef } from 'react';
 
-import { Form, Button, Table, Spinner } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
 import ResultTable from './resultTable';
 import SkillsRequired from './skillsRequired';
 const ResumeUploader = () => {

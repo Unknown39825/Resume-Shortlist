@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Accordion, Badge, Button, Modal, Table } from 'react-bootstrap';
+import {  Button,  Table } from 'react-bootstrap';
 import LandingModal from './LandingModal';
 
 const ResultTable = (

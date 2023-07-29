@@ -13,7 +13,7 @@ import shortlist
 # build the react application
 # if the arg build is given then build the react application
 
-os.system('npm i && npm run build --prefix client')
+# os.system('npm i && npm run build --prefix client')
 
 # python app setup
 app = Flask(__name__, static_folder="./client/build")
@@ -21,7 +21,7 @@ app = Flask(__name__, static_folder="./client/build")
 CORS(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-cf_port = os.getenv("PORT")
+# cf_port = request.environ.get('REMOTE_PORT')
 
 # allowed files
 def allowed_file(filename):
@@ -129,4 +129,4 @@ if __name__ == '__main__':
 	if cf_port is None:
 		app.run(host='0.0.0.0', port=5000, debug=True)
 	else:
-		app.run(host='0.0.0.0', port=int(cf_port), debug=False)
+		app.run( debug=False)

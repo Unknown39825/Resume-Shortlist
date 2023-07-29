@@ -73,4 +73,4 @@ def predictResults(requiredText):
 
 
 
-# modelTrain(df)
+modelTrain(df)

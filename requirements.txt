@@ -12,3 +12,4 @@ openpyxl
 seaborn
 wordcloud
 scikit-learn
+Gunicorn

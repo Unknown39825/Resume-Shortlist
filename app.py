@@ -21,7 +21,7 @@ app = Flask(__name__, static_folder="./client/build")
 CORS(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# cf_port = request.environ.get('REMOTE_PORT')
+cf_port = os.getenv("PORT")
 
 # allowed files
 def allowed_file(filename):
@@ -125,8 +125,6 @@ def static_proxy(path):
     dir_name = os.path.join(app.static_folder, "/".join(path.split("/")[:-1]))
     return send_from_directory(dir_name, file_name)
 
-if __name__ == '__main__':
-	if cf_port is None:
-		app.run(host='0.0.0.0', port=5000, debug=True)
-	else:
-		app.run( debug=False)
+
+if __name__ == "__main__":
+        app.run()
